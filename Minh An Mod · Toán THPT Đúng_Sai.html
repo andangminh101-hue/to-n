@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minh An Mod · Toán THPT Đúng/Sai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FFFFFF;
+    --card: #FFFFFF;
+    --ink: #000000;
+    --muted: #444444;
+    --line: #9A9A9A;
+    --true: #0F766E;
+    --true-bg: #E3F4F1;
+    --false: #B42318;
+    --false-bg: #FBE7E4;
+    --accent: #E0A100;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0E1622;
+      --card: #172233;
+      --ink: #E6ECF5;
+      --muted: #9AA7BA;
+      --line: #2B3A50;
+      --true: #5FD3C6;
+      --true-bg: #15332F;
+      --false: #FF8A7A;
+      --false-bg: #3A1F1C;
+      --accent: #F2C14E;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0E1622;
+    --card: #172233;
+    --ink: #E6ECF5;
+    --muted: #9AA7BA;
+    --line: #2B3A50;
+    --true: #5FD3C6;
+    --true-bg: #15332F;
+    --false: #FF8A7A;
+    --false-bg: #3A1F1C;
+    --accent: #F2C14E;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: 96px; }
+  body {
+    margin: 0;
+    font-family: "Times New Roman", Times, Tinos, serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .bar {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand { flex: 1; min-width: 180px; }
+  .brand h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .brand p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+  .score {
+    text-align: right;
+  }
+  .score strong {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .score span { font-size: 0.85rem; color: var(--muted); }
+  .progress {
+    width: 100%;
+    height: 6px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress > div {
+    height: 100%;
+    width: 0%;
+    background: var(--ink);
+    transition: width 0.4s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .progress > div { transition: none; }
+  }
+
+  /* ---------- Layout ---------- */
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+  }
+  .intro {
+    font-size: 0.97rem;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0 0 24px;
+  }
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  /* ---------- Buttons ---------- */
+  button {
+    font: inherit;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 0;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.93rem;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  button:hover { border-color: var(--ink); }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ---------- Question card ---------- */
+  .question {
+    background: var(--card);
+    border: none;
+    border-bottom: 1px dashed var(--line);
+    border-radius: 0;
+    padding: 4px 0 20px;
+    margin-bottom: 14px;
+  }
+  .q-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .q-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .q-topic {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .q-text {
+    font-size: 1.02rem;
+    margin: 0 0 16px;
+    white-space: pre-line;
+  }
+  .q-text sup { font-size: 0.7em; }
+
+  .statement {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+  .letter {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .stmt-text { font-size: 0.97rem; }
+  .choices { display: flex; gap: 6px; }
+  .choice {
+    padding: 7px 12px;
+    font-size: 0.85rem;
+    min-width: 64px;
+  }
+  .choice[aria-pressed="true"][data-val="T"] {
+    background: var(--true-bg);
+    border-color: var(--true);
+    color: var(--true);
+  }
+  .choice[aria-pressed="true"][data-val="F"] {
+    background: var(--false-bg);
+    border-color: var(--false);
+    color: var(--false);
+  }
+
+  .statement.ok .stmt-text::after { content: " ✓"; color: var(--true); font-weight: 700; }
+  .statement.bad .stmt-text::after { content: " ✗"; color: var(--false); font-weight: 700; }
+
+  .q-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .q-result { font-size: 0.93rem; color: var(--muted); }
+  .q-result strong { color: var(--ink); }
+
+  .explain {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--paper);
+    border-radius: 12px;
+    font-size: 0.93rem;
+  }
+  .question.checked .explain { display: block; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin-bottom: 0; }
+  .explain b { font-weight: 700; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 32px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 560px) {
+    .statement {
+      grid-template-columns: 1.6rem 1fr;
+    }
+    .choices {
+      grid-column: 2 / 3;
+    }
+    .choice { flex: 1; }
+    .score strong { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="brand">
+      <h1>Minh An Mod</h1>
+      <p>Luyện Toán THPT · Dạng câu Đúng / Sai</p>
+    </div>
+    <div class="score" aria-live="polite">
+      <strong id="totalScore">0.00</strong>
+      <span>/ <span id="maxScore">0</span> điểm</span>
+    </div>
+  </div>
+  <div class="bar" style="padding-top:0">
+    <div class="progress" role="progressbar" aria-label="Tiến độ làm bài" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+      <div id="progressFill"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <p class="intro">
+    Mỗi câu có 4 ý a, b, c, d. Chọn <b>Đúng</b> hoặc <b>Sai</b> cho từng ý, sau đó bấm <b>Chấm bài</b>.
+    Thang điểm: đúng 1 ý được 0,1 điểm; 2 ý được 0,25; 3 ý được 0,5; cả 4 ý được 1 điểm.
+  </p>
+
+  <div class="toolbar">
+    <button class="btn-primary" id="checkAll">Chấm toàn bộ</button>
+    <button id="resetAll">Làm lại</button>
+    <button id="themeBtn" aria-label="Đổi giao diện sáng tối">Đổi giao diện</button>
+  </div>
+
+  <section id="list" aria-label="Danh sách câu hỏi"></section>
+
+  <footer>Minh An Mod · Dữ liệu câu hỏi do bạn tự kiểm tra lại trước khi dùng để ôn thi.</footer>
+</main>
+
+<script>
+const QUESTIONS = [
+  {
+    topic: "Khảo sát hàm số",
+    text: "Cho hàm số f(x) = x³ − 3x² + 1.",
+    items: [
+      { s: "f′(x) = 3x² − 6x.", ans: true,
+        why: "Đạo hàm: (x³)′ = 3x², (−3x²)′ = −6x." },
+      { s: "Hàm số đạt cực đại tại x = 0.", ans: true,
+        why: "f′(x) = 3x(x − 2) đổi dấu từ + sang − khi đi qua x = 0, nên x = 0 là điểm cực đại." },
+      { s: "Giá trị cực tiểu của hàm số bằng −3.", ans: true,
+        why: "Điểm cực tiểu là x = 2, f(2) = 8 − 12 + 1 = −3." },
+      { s: "Hàm số đồng biến trên khoảng (2; +∞).", ans: true,
+        why: "Với x > 2 thì f′(x) = 3x(x − 2) > 0, nên hàm số đồng biến trên (2; +∞)." }
+    ]
+  },
+  {
+    topic: "Đạo hàm và tiếp tuyến",
+    text: "Cho hàm số g(x) = x · eˣ.",
+    items: [
+      { s: "g′(x) = eˣ(x + 1).", ans: true,
+        why: "Dùng quy tắc tích: g′(x) = eˣ + x·eˣ = eˣ(x + 1)." },
+      { s: "g′(0) = 1.", ans: true,
+        why: "Thay x = 0: g′(0) = e⁰(0 + 1) = 1." },
+      { s: "Phương trình tiếp tuyến của đồ thị tại điểm có x = 0 là y = x.", ans: true,
+        why: "g(0) = 0 và g′(0) = 1, nên tiếp tuyến là y = 0 + 1·(x − 0) = x." },
+      { s: "g″(x) = eˣ(x + 1).", ans: false,
+        why: "g″(x) = eˣ(x + 1) + eˣ = eˣ(x + 2), không phải eˣ(x + 1)." }
+    ]
+  },
+  {
+    topic: "Nguyên hàm và tích phân",
+    text: "Xét các tích phân sau.",
+    items: [
+      { s: "∫₀¹ (2x + 1) dx = 2.", ans: true,
+        why: "∫₀¹ (2x + 1) dx = [x² + x]₀¹ = 2." },
+      { s: "∫₀² x dx = 2.", ans: true,
+        why: "∫₀² x dx = [x²/2]₀² = 2." },
+      { s: "∫₁² (1/x) dx = 1.", ans: false,
+        why: "∫₁² (1/x) dx = ln 2 − ln 1 = ln 2, không bằng 1." },
+      { s: "∫₀^π sin x dx = 2.", ans: true,
+        why: "∫₀^π sin x dx = [−cos x]₀^π = −cos π + cos 0 = 1 + 1 = 2." }
+    ]
+  },
+  {
+    topic: "Hình học không gian",
+    text: "Cho hình chóp S.ABCD có đáy ABCD là hình vuông cạnh a, SA vuông góc với đáy và SA = a.",
+    items: [
+      { s: "SC vuông góc với BD.", ans: true,
+        why: "BD ⊥ AC và BD ⊥ SA nên BD ⊥ (SAC), do đó BD ⊥ SC." },
+      { s: "Góc giữa SC và mặt đáy bằng 45°.", ans: false,
+        why: "Góc giữa SC và đáy là góc SCA, có tan(SCA) = SA/AC = a/(a√2) = 1/√2, nên không phải 45°." },
+      { s: "Thể tích khối chóp S.ABCD bằng a³/3.", ans: true,
+        why: "V = (1/3) · S_đáy · SA = (1/3) · a² · a = a³/3." },
+      { s: "Khoảng cách từ A đến mặt phẳng (SBC) bằng a√2/2.", ans: true,
+        why: "BC ⊥ (SAB) nên (SBC) ⊥ (SAB). Trong tam giác vuông SAB, khoảng cách từ A đến SB là a/√2 = a√2/2." }
+    ]
+  },
+  {
+    topic: "Xác suất",
+    text: "Gieo đồng thời hai con xúc xắc cân đối và đồng chất, quan sát số chấm trên mặt trên của mỗi con.",
+    items: [
+      { s: "Không gian mẫu có 36 phần tử.", ans: true,
+        why: "Mỗi con có 6 khả năng nên có 6 × 6 = 36 kết quả." },
+      { s: "Xác suất để tổng số chấm bằng 7 là 1/6.", ans: true,
+        why: "Có 6 cặp có tổng bằng 7: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1). Xác suất = 6/36 = 1/6." },
+      { s: "Xác suất để hai con xúc xắc có cùng số chấm là 1/3.", ans: false,
+        why: "Có 6 kết quả cùng số chấm, xác suất = 6/36 = 1/6, không phải 1/3." },
+      { s: "Xác suất để tổng số chấm không nhỏ hơn 10 là 1/6.", ans: true,
+        why: "Các trường hợp tổng ≥ 10: (4,6), (5,5), (6,4), (5,6), (6,5), (6,6), gồm 6 kết quả, xác suất = 6/36 = 1/6." }
+    ]
+  },
+  {
+    topic: "Phương trình lôgarit",
+    text: "Xét phương trình log₂(x − 1) = 3.",
+    items: [
+      { s: "Điều kiện xác định của phương trình là x > 1.", ans: true,
+        why: "Lôgarit chỉ xác định khi x − 1 > 0, tức x > 1." },
+      { s: "Phương trình có nghiệm x = 9.", ans: true,
+        why: "x − 1 = 2³ = 8 nên x = 9, thỏa mãn điều kiện." },
+      { s: "Phương trình có hai nghiệm phân biệt.", ans: false,
+        why: "Phương trình chỉ có đúng một nghiệm x = 9." },
+      { s: "Tổng các nghiệm của phương trình bằng 9.", ans: true,
+        why: "Phương trình chỉ có nghiệm x = 9, nên tổng các nghiệm là 9." }
+    ]
+  },
+  {
+    topic: "Đồng biến, nghịch biến",
+    text: "Cho hàm số f(x) = x³ − 3x + 2.",
+    items: [
+      { s: "Hàm số đồng biến trên khoảng (1; +∞).", ans: true,
+        why: "f′(x) = 3x² − 3 = 3(x − 1)(x + 1) > 0 khi x > 1." },
+      { s: "Hàm số nghịch biến trên khoảng (−1; 1).", ans: true,
+        why: "Trên (−1; 1) có x² − 1 < 0 nên f′(x) < 0, hàm số nghịch biến." },
+      { s: "Hàm số đồng biến trên khoảng (−1; 1).", ans: false,
+        why: "Trên (−1; 1) hàm số nghịch biến, nên không đồng biến." },
+      { s: "Hàm số đồng biến trên các khoảng (−∞; −1) và (1; +∞).", ans: true,
+        why: "f′(x) > 0 khi x < −1 hoặc x > 1, nên hàm số đồng biến trên hai khoảng đó." }
+    ]
+  },
+  {
+    topic: "Đồ thị hàm bậc ba",
+    text: "Cho hàm số y = x³ − 3x có đồ thị (C) như hình dưới.<br><svg viewBox=\"0 0 300 300\" role=\"img\" aria-label=\"Đồ thị y = x³ − 3x\" style=\"display:block;width:100%;max-width:300px;margin:12px auto;color:var(--ink)\"><line x1=\"20\" y1=\"150\" x2=\"285\" y2=\"150\" stroke=\"currentColor\" stroke-opacity=\"0.5\"/><line x1=\"150\" y1=\"10\" x2=\"150\" y2=\"290\" stroke=\"currentColor\" stroke-opacity=\"0.5\"/><text x=\"272\" y=\"142\" font-size=\"12\" fill=\"currentColor\">x</text><text x=\"156\" y=\"18\" font-size=\"12\" fill=\"currentColor\">y</text><text x=\"136\" y=\"164\" font-size=\"12\" fill=\"currentColor\">O</text><polyline points=\"66,268 78,167 90,105 110,70 130,95 150,150 170,205 190,230 210,195 222,133 234,32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/></svg>",
+    items: [
+      { s: "Hàm số đồng biến trên khoảng (−∞; −1).", ans: true,
+        why: "f′(x) = 3(x² − 1) > 0 khi x < −1, nên hàm số đồng biến trên (−∞; −1)." },
+      { s: "Hàm số nghịch biến trên khoảng (−1; 1).", ans: true,
+        why: "Trên (−1; 1), f′(x) < 0 nên hàm số nghịch biến, đồ thị đi xuống." },
+      { s: "Đồ thị (C) cắt trục hoành tại ba điểm phân biệt.", ans: true,
+        why: "x³ − 3x = 0 có ba nghiệm x = 0 và x = ±√3, nên đồ thị cắt trục hoành tại ba điểm." },
+      { s: "Đồ thị (C) đi qua điểm (1; 2).", ans: false,
+        why: "Thay x = 1 được y = 1 − 3 = −2, nên điểm thuộc đồ thị là (1; −2), không phải (1; 2)." }
+    ]
+  },
+  {
+    topic: "Đồ thị hàm bậc hai",
+    text: "Cho hàm số y = −x² + 4x − 3 có đồ thị là một parabol.",
+    items: [
+      { s: "Hàm số đồng biến trên khoảng (−∞; 2).", ans: true,
+        why: "Hệ số a = −1 < 0 nên parabol quay bề lõm xuống, đỉnh có hoành độ x = 2; hàm số tăng trước đỉnh." },
+      { s: "Hàm số nghịch biến trên khoảng (2; +∞).", ans: true,
+        why: "Sau đỉnh x = 2, parabol đi xuống nên hàm số nghịch biến trên (2; +∞)." },
+      { s: "Giá trị lớn nhất của hàm số bằng 3.", ans: false,
+        why: "Đỉnh là I(2; 1), nên giá trị lớn nhất là y = 1, không phải 3." },
+      { s: "Đồ thị cắt trục hoành tại hai điểm có hoành độ 1 và 3.", ans: true,
+        why: "−x² + 4x − 3 = 0 ⇔ x² − 4x + 3 = 0 ⇔ x = 1 hoặc x = 3." }
+    ]
+  },
+  {
+    topic: "Đọc đồ thị",
+    text: "Cho hàm số y = f(x) liên tục trên ℝ, có đồ thị như hình dưới.<br><svg viewBox='0 0 360 250' role='img' aria-label='Đồ thị hàm số y = f(x)' style='display:block;width:100%;max-width:360px;margin:12px auto;color:var(--ink)'><line x1='30' y1='220' x2='350' y2='220' stroke='currentColor'/><line x1='40' y1='10' x2='40' y2='235' stroke='currentColor'/><g stroke='currentColor' stroke-opacity='0.6' stroke-dasharray='4 4'><line x1='100' y1='40' x2='100' y2='220'/><line x1='40' y1='40' x2='100' y2='40'/><line x1='160' y1='160' x2='160' y2='220'/><line x1='40' y1='160' x2='160' y2='160'/><line x1='220' y1='100' x2='220' y2='220'/><line x1='40' y1='100' x2='220' y2='100'/></g><g font-size='12' fill='currentColor'><text x='26' y='236'>O</text><text x='96' y='236'>1</text><text x='156' y='236'>2</text><text x='216' y='236'>3</text><text x='276' y='236'>4</text><text x='24' y='44'>3</text><text x='24' y='104'>2</text><text x='24' y='164'>1</text><text x='34' y='14'>y</text><text x='336' y='236'>x</text></g><path d='M50,200 C70,40 85,40 100,40 C120,40 140,160 160,160 C180,160 200,100 220,100 C240,100 260,220 280,220 C300,220 315,60 335,15' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linejoin='round'/></svg>",
+    items: [
+      { s: "Hàm số đồng biến trên khoảng (1; 2).", ans: false,
+        why: "Trên (1; 2) đồ thị đi xuống từ (1; 3) đến (2; 1), nên hàm số nghịch biến trên khoảng này." },
+      { s: "Hàm số đồng biến trên khoảng (2; 3).", ans: true,
+        why: "Trên (2; 3) đồ thị đi lên từ (2; 1) đến (3; 2), nên hàm số đồng biến." },
+      { s: "Hàm số nghịch biến trên khoảng (1; 2).", ans: true,
+        why: "Đây chính là khoảng đồ thị đi xuống từ đỉnh (1; 3) đến điểm cực tiểu (2; 1)." },
+      { s: "Hàm số đồng biến trên khoảng (−∞; 3).", ans: false,
+        why: "Trên (1; 2) hàm số nghịch biến nên không thể đồng biến trên cả (−∞; 3)." }
+    ]
+  },
+  {
+    topic: "Bảng biến thiên",
+    text: "Cho hàm số y = f(x) liên tục trên ℝ có bảng biến thiên như sau.<table style='border-collapse:collapse;margin:12px auto;font-size:0.95rem;text-align:center'><tr><td style='border:1px solid currentColor;padding:4px 8px'>x</td><td style='border:1px solid currentColor;padding:4px 8px'>−∞</td><td style='border:1px solid currentColor;padding:4px 8px'></td><td style='border:1px solid currentColor;padding:4px 8px'>1</td><td style='border:1px solid currentColor;padding:4px 8px'></td><td style='border:1px solid currentColor;padding:4px 8px'>3</td><td style='border:1px solid currentColor;padding:4px 8px'></td><td style='border:1px solid currentColor;padding:4px 8px'>+∞</td></tr><tr><td style='border:1px solid currentColor;padding:4px 8px'>f′(x)</td><td style='border:1px solid currentColor;padding:4px 8px'></td><td style='border:1px solid currentColor;padding:4px 8px'>−</td><td style='border:1px solid currentColor;padding:4px 8px'>0</td><td style='border:1px solid currentColor;padding:4px 8px'>+</td><td style='border:1px solid currentColor;padding:4px 8px'>0</td><td style='border:1px solid currentColor;padding:4px 8px'>−</td><td style='border:1px solid currentColor;padding:4px 8px'></td></tr><tr><td style='border:1px solid currentColor;padding:4px 8px'>f(x)</td><td style='border:1px solid currentColor;padding:4px 8px'>+∞</td><td style='border:1px solid currentColor;padding:4px 8px'>↘</td><td style='border:1px solid currentColor;padding:4px 8px'>−1</td><td style='border:1px solid currentColor;padding:4px 8px'>↗</td><td style='border:1px solid currentColor;padding:4px 8px'>3</td><td style='border:1px solid currentColor;padding:4px 8px'>↘</td><td style='border:1px solid currentColor;padding:4px 8px'>−∞</td></tr></table>",
+    items: [
+      { s: "Hàm số nghịch biến trên khoảng (−∞; 1).", ans: true,
+        why: "Trên (−∞; 1), f′(x) < 0 và mũi tên đi xuống." },
+      { s: "Hàm số đồng biến trên khoảng (1; 3).", ans: true,
+        why: "Trên (1; 3), f′(x) > 0 và f(x) tăng từ −1 lên 3." },
+      { s: "Giá trị cực đại của hàm số bằng 3.", ans: true,
+        why: "Tại x = 3, hàm số đổi từ đồng biến sang nghịch biến nên đạt cực đại, với f(3) = 3." },
+      { s: "Hàm số đạt cực tiểu tại x = 3.", ans: false,
+        why: "Tại x = 3 hàm số đạt cực đại, không phải cực tiểu. Điểm cực tiểu là x = 1." }
+    ]
+  }
+];
+
+const POINTS = { 0: 0, 1: 0.1, 2: 0.25, 3: 0.5, 4: 1 };
+const LETTERS = ["a", "b", "c", "d"];
+const state = QUESTIONS.map(q => ({ answers: Array(q.items.length).fill(null), checked: false }));
+
+const list = document.getElementById("list");
+const totalScoreEl = document.getElementById("totalScore");
+const maxScoreEl = document.getElementById("maxScore");
+const progressFill = document.getElementById("progressFill");
+const progressBar = document.getElementById("progressBar");
+
+function fmt(n) { return n.toFixed(2).replace(".", ","); }
+
+function buildList() {
+  list.innerHTML = "";
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement("article");
+    card.className = "question";
+    card.id = "q" + qi;
+    card.innerHTML = `
+      <div class="q-head">
+        <span class="q-num">Câu ${qi + 1}.</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      <div class="stmts"></div>
+      <div class="q-foot">
+        <span class="q-result" aria-live="polite"></span>
+        <button class="btn-check">Chấm câu này</button>
+      </div>
+      <div class="explain"></div>
+    `;
+    const stmts = card.querySelector(".stmts");
+    q.items.forEach((it, ii) => {
+      const row = document.createElement("div");
+      row.className = "statement";
+      row.dataset.item = ii;
+      row.innerHTML = `
+        <span class="letter">${LETTERS[ii]})</span>
+        <span class="stmt-text">${it.s}</span>
+        <div class="choices" role="group" aria-label="Ý ${LETTERS[ii]}">
+          <button class="choice" data-val="T" aria-pressed="false">Đúng</button>
+          <button class="choice" data-val="F" aria-pressed="false">Sai</button>
+        </div>
+      `;
+      stmts.appendChild(row);
+    });
+    list.appendChild(card);
+  });
+  bindEvents();
+  render();
+}
+
+function bindEvents() {
+  list.querySelectorAll(".question").forEach((card, qi) => {
+    card.querySelectorAll(".statement").forEach(row => {
+      const ii = +row.dataset.item;
+      row.querySelectorAll(".choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (state[qi].checked) return;
+          const val = btn.dataset.val === "T";
+          state[qi].answers[ii] = state[qi].answers[ii] === val ? null : val;
+          render();
+        });
+      });
+    });
+    card.querySelector(".btn-check").addEventListener("click", () => {
+      if (state[qi].answers.some(a => a === null)) {
+        card.querySelector(".q-result").textContent = "Hãy chọn Đúng hoặc Sai cho cả 4 ý trước khi chấm.";
+        return;
+      }
+      state[qi].checked = true;
+      render();
+    });
+  });
+}
+
+function scoreOf(qi) {
+  const q = QUESTIONS[qi];
+  const correct = q.items.filter((it, ii) => state[qi].answers[ii] === it.ans).length;
+  return { correct, points: POINTS[correct] };
+}
+
+function render() {
+  let total = 0, max = 0, answered = 0, totalItems = 0;
+
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.getElementById("q" + qi);
+    const st = state[qi];
+    card.classList.toggle("checked", st.checked);
+    const { correct, points } = scoreOf(qi);
+    total += st.checked ? points : 0;
+    max += 1;
+    totalItems += q.items.length;
+    answered += st.answers.filter(a => a !== null).length;
+
+    card.querySelectorAll(".statement").forEach((row, ii) => {
+      const val = st.answers[ii];
+      row.querySelectorAll(".choice").forEach(btn => {
+        const isT = btn.dataset.val === "T";
+        btn.setAttribute("aria-pressed", String((val === true && isT) || (val === false && !isT)));
+        btn.disabled = st.checked;
+      });
+      row.classList.remove("ok", "bad");
+      if (st.checked && val !== null) {
+        row.classList.add(val === q.items[ii].ans ? "ok" : "bad");
+      }
+    });
+
+    const result = card.querySelector(".q-result");
+    const checkBtn = card.querySelector(".btn-check");
+    checkBtn.style.display = st.checked ? "none" : "";
+    if (st.checked) {
+      result.innerHTML = `Đúng <strong>${correct}/4</strong> ý · <strong>${fmt(points)}</strong> điểm`;
+      const explain = card.querySelector(".explain");
+      explain.innerHTML = q.items.map((it, ii) =>
+        `<p><b>${LETTERS[ii]})</b> ${it.ans ? "Đúng" : "Sai"}. ${it.why}</p>`
+      ).join("");
+    } else {
+      const n = st.answers.filter(a => a !== null).length;
+      result.textContent = `Đã chọn ${n}/4 ý`;
+    }
+  });
+
+  totalScoreEl.textContent = fmt(total);
+  maxScoreEl.textContent = max;
+  const pct = Math.round((answered / totalItems) * 100);
+  progressFill.style.width = pct + "%";
+  progressBar.setAttribute("aria-valuenow", String(pct));
+}
+
+document.getElementById("checkAll").addEventListener("click", () => {
+  let missing = null;
+  state.forEach((st, qi) => {
+    if (st.checked) return;
+    if (st.answers.some(a => a === null)) {
+      if (missing === null) missing = qi;
+      return;
+    }
+    st.checked = true;
+  });
+  render();
+  if (missing !== null) {
+    const card = document.getElementById("q" + missing);
+    card.querySelector(".q-result").textContent = "Câu này còn ý chưa chọn. Hãy hoàn thành rồi chấm lại.";
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  state.forEach(st => { st.answers = st.answers.map(() => null); st.checked = false; });
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.getAttribute("data-theme") === "dark" ||
+    (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-theme", dark ? "light" : "dark");
+});
+
+maxScoreEl.textContent = QUESTIONS.length;
+buildList();
+</script>
+</body>
+</html>
